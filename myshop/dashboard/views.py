@@ -4,7 +4,7 @@ from accounts.models import SellerProfile
 from products.models import Product
 from orders.models import Order
 from accounts.forms import SellerBankDetailsForm
-from products.forms import ProductForm
+from products.forms import ProductReviewForm
 
 @login_required
 def seller_dashboard(request):
@@ -34,26 +34,26 @@ def manage_products(request):
 @login_required
 def add_product(request):
     if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES)
+        form = ProductReviewForm(request.POST, request.FILES)
         if form.is_valid():
             product = form.save(commit=False)
             product.seller = request.user.seller_profile
             product.save()
             return redirect('manage_products')
     else:
-        form = ProductForm()
+        form = ProductReviewForm()
     return render(request, 'seller/add_product.html', {'form': form})
 
 @login_required
 def edit_product(request, product_id):
     product = get_object_or_404(Product, id=product_id, seller=request.user.seller_profile)
     if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES, instance=product)
+        form = ProductReviewForm(request.POST, request.FILES, instance=product)
         if form.is_valid():
             form.save()
             return redirect('manage_products')
     else:
-        form = ProductForm(instance=product)
+        form = ProductReviewForm(instance=product)
     return render(request, 'seller/edit_product.html', {'form': form, 'product': product})
 
 @login_required

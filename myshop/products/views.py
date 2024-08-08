@@ -2,11 +2,24 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Product, Category, ProductReview
 from django.contrib.auth.decorators import login_required
 from .forms import ProductReviewForm
+from .recommendations import recommend_products
+from .forms import FavoriteCategoriesForm
 
+# showing by interest
+def main_page(request):
+ # Get all products
+    products = Product.objects.all()
+    
+    # Get recommended products if the user is logged in
+    recommended_products = []
+    if request.user.is_authenticated:
+        recommended_products = recommend_products(request.user)
 
-def home(request):
-    return render(request, 'products/home.html')
-
+    return render(request, 'main_page.html', {
+        'products': products,
+        'recommended_products': recommended_products,
+    })
+       
 def product_list(request, category_slug=None):
     category = None
     categories = Category.objects.all()
@@ -49,3 +62,15 @@ def add_product_review(request, product_id):
 
     return render(request, 'products/add_product_review.html', {'form': form, 'product': product})
 
+# update interests
+@login_required
+def update_preferences(request):
+    if request.method == 'POST':
+        form = FavoriteCategoriesForm(request.POST, instance=request.user.buyer_profile)
+        if form.is_valid():
+            form.save()
+            return redirect('main_page')
+    else:
+        form = FavoriteCategoriesForm(instance=request.user.buyer_profile)
+
+    return render(request, 'update_preferences.html', {'form': form})
