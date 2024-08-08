@@ -1,7 +1,12 @@
 from django import forms
-from .models import Product
+from .models import ProductReview
 
-class ProductForm(forms.ModelForm):
+class ProductReviewForm(forms.ModelForm):
     class Meta:
-        model = Product
-        fields = ['category', 'name', 'description', 'price', 'stock', 'image', 'color']
+        model = ProductReview
+        fields = ['rating', 'title', 'body']
+        widgets = {
+            'rating': forms.Select(attrs={'class': 'form-control'}),
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'body': forms.Textarea(attrs={'class': 'form-control'}),
+        }

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Cart</title>
+</head>
+<body>
+    <h1>Your Cart</h1>
+    <form method="post" action="{% url 'update_cart' %}">
+        {% csrf_token %}
+        <ul>
+            {% for item in cart.items.all %}
+                <li>
+                    {{ item.product.name }} - {{ item.quantity }} x {{ item.product.display_price }} Toman
+                    <input type="number" name="quantity_{{ item.id }}" value="{{ item.quantity }}">
+                    <a href="{% url 'remove_from_cart' item.id %}">Remove</a>
+                </li>
+            {% endfor %}
+        </ul>
+        <p>Total: {{ cart.get_total_price }} Toman</p>
+        <button type="submit">Update Cart</button>
+    </form>
+    <a href="{% url 'checkout' %}">Proceed to Checkout</a>
+</body>
+</html>

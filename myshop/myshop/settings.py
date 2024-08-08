@@ -21,9 +21,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'accounts',  
-    'products',
+    'accounts',
+    'dashboard',
     'orders',
+    'products',
     
 ]
 
@@ -119,3 +120,7 @@ LANGUAGES = [
 LOCALE_PATHS = [
     os.path.join(BASE_DIR, 'locale'),
 ]
+
+# ZARINPAL 
+ZARINPAL_MERCHANT_ID = 'your-merchant-id'
+ZARINPAL_SANDBOX = True  # Use True for testing and False for production

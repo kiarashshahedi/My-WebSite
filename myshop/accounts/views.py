@@ -1,8 +1,9 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.db import IntegrityError
 from django.contrib.auth.decorators import login_required
-
+from .forms import SellerBankDetailsForm
+from .models import SellerProfile
 
 # models 
 from products.models import Product
@@ -109,4 +110,17 @@ def seller_dashboard(request):
     return render(request, 'accounts/seller_dashboard.html', {'products': products, 'orders': orders})
 
 
+# show bank and payments to seller
+@login_required
+def update_bank_details(request):
+    seller_profile = request.user.seller_profile
 
+    if request.method == 'POST':
+        form = SellerBankDetailsForm(request.POST, instance=seller_profile)
+        if form.is_valid():
+            form.save()
+            return redirect('seller_dashboard')  # Redirect to seller's dashboard after saving
+    else:
+        form = SellerBankDetailsForm(instance=seller_profile)
+
+    return render(request, 'seller/update_bank_details.html', {'form': form})
