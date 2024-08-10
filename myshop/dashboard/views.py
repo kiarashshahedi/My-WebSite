@@ -46,14 +46,17 @@ def add_product(request):
 
 @login_required
 def edit_product(request, product_id):
+    # Get the product to edit, ensuring it belongs to the current seller
     product = get_object_or_404(Product, id=product_id, seller=request.user.seller_profile)
+    
     if request.method == 'POST':
-        form = ProductReviewForm(request.POST, request.FILES, instance=product)
+        form = ProductForm(request.POST, request.FILES, instance=product)
         if form.is_valid():
-            form.save()
-            return redirect('manage_products')
+            form.save()  # Save the updated product
+            return redirect('manage_products')  # Redirect to the product management page
     else:
-        form = ProductReviewForm(instance=product)
+        form = ProductForm(instance=product)  # Populate the form with the product's existing data
+
     return render(request, 'dashboard/edit_product.html', {'form': form, 'product': product})
 
 @login_required

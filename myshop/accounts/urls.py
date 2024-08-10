@@ -5,11 +5,21 @@ from django.contrib.auth.views import LogoutView
 
 
 urlpatterns = [
+    # SELLER 
     path('signup/seller/', views.seller_signup, name='seller_signup'),
+    path('seller_dashboard/', views.seller_dashboard, name='seller_dashboard'),
+
+    # BUYER
     path('signup/buyer/', views.buyer_signup, name='buyer_signup'),
+    path('buyer/dashboard/', views.buyer_dashboard, name='buyer_dashboard'),
+    path('profile/update/', views.update_buyer_profile, name='update_buyer_profile'),
+    path('shipping/addresses/', views.manage_shipping_addresses, name='manage_shipping_addresses'),
+    path('order/history/', views.order_history, name='order_history'),
+    path('order/<int:order_id>/', views.order_detail, name='order_detail'),
+    
+    # LOGOUT
     path('logout/', LogoutView.as_view(), name='logout'),
     
-    path('seller_dashboard/', views.seller_dashboard, name='seller_dashboard'),
     
 
 ]

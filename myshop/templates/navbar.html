@@ -5,29 +5,32 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'main_page' %}">Home</a>
+            </li>
+
             {% if user.is_authenticated %}
+                {% if user.is_seller %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'seller_dashboard' %}">Seller Dashboard</a>
+                    </li>
+                {% elif user.is_buyer %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'buyer_dashboard' %}">Buyer Dashboard</a>
+                    </li>
+                {% endif %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'main_page' %}">home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'seller_dashboard' %}">seller dashboard</a>
-                </li>
-                <li class="nav-item">
-                    <form method="post" action="{% url 'logout' %}">
+                    <form method="post" action="{% url 'logout' %}" class="form-inline">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-link nav-link" style="display: inline; cursor: pointer;">Logout</button>
                     </form>
                 </li>
             {% else %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'main_page' %}">home</a>
-                </li>
-            
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'seller_signup' %}">Signup seller</a>
+                    <a class="nav-link" href="{% url 'seller_signup' %}">Signup as Seller</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'buyer_signup' %}">Signup buyer</a>
+                    <a class="nav-link" href="{% url 'buyer_signup' %}">Signup as Buyer</a>
                 </li>
             {% endif %}
         </ul>

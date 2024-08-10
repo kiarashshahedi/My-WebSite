@@ -7,8 +7,6 @@ class CustomUser(AbstractUser):
     is_seller = models.BooleanField(default=False)
     is_buyer = models.BooleanField(default=True)
     phone_number = models.CharField(max_length=15, null=True, blank=True)
-    address = models.TextField(null=True, blank=True)
-    
     # برای اینکه کاربران بتوانند عکس پروفایل را آپلود کنند
     profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
     # برای پیگیری زمان عضویت کاربر به پلتفرم 
@@ -54,6 +52,22 @@ class SellerProfile(models.Model):
     def __str__(self):
         return self.store_name
 
+# address model 
+class ShippingAddress(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    address_line1 = models.CharField(max_length=255)
+    address_line2 = models.CharField(max_length=255, blank=True)
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    postal_code = models.CharField(max_length=20)
+    country = models.CharField(max_length=100)
+    is_default = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.address_line1}, {self.city}, {self.country}"
+    
+
+
 # Buyer Profile
 class BuyerProfile(models.Model):
     
@@ -75,7 +89,22 @@ class BuyerProfile(models.Model):
     loyalty_points = models.PositiveIntegerField(default=0)
     # اینکه آیا خریدار مشترک خبرنامه است
     newsletter_subscription = models.BooleanField(default=False)
-
+    # address fields
+    shipping_addresses = models.ManyToManyField('ShippingAddress', blank=True)
+    billing_address = models.ForeignKey('ShippingAddress', related_name='billing_address_for', null=True, blank=True, on_delete=models.SET_NULL)
     
     def __str__(self):
         return self.user.username
+
+    def get_last_orders(self):
+        return self.buy_history.order_by('-created_at')[:5]
+    
+    def get_total_spent(self):
+        return sum(order.total_price for order in self.buy_history.all())
+    
+    def add_to_wishlist(self, product):
+        self.wishlist.add(product)
+    
+    def remove_from_wishlist(self, product):
+        self.wishlist.remove(product)
+
