@@ -1,9 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Product List</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}product list{% endblock %}
+
+{% block content %}
     <h1>Products</h1>
     <ul>
         {% for category in categories %}
@@ -20,5 +19,4 @@
             </div>
         {% endfor %}
     </div>
-</body>
-</html>
+{% endblock%}

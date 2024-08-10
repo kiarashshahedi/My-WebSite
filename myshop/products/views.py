@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import ProductReviewForm
 from .recommendations import recommend_products
 from .forms import FavoriteCategoriesForm
+from orders.models import Order
 
 # showing by interest
 def main_page(request):
@@ -38,6 +39,10 @@ def product_detail(request, product_id):
     related_products = Product.objects.filter(category=product.category).exclude(id=product.id)[:4]
     reviews = product.reviews.all()
 
+    # Track product view interaction
+    if request.user.is_authenticated:
+        UserProductInteraction.objects.create(user=request.user, product=product, interaction_type='view')
+
     return render(request, 'products/product_detail.html', {
         'product': product,
         'related_products': related_products,
@@ -47,6 +52,11 @@ def product_detail(request, product_id):
 @login_required
 def add_product_review(request, product_id):
     product = get_object_or_404(Product, id=product_id)
+
+    # Check if the user has purchased this product
+    if not Order.objects.filter(user=request.user, items__product=product).exists():
+        return redirect('product_detail', product_id=product.id)  # Or show an error message
+
     if request.method == 'POST':
         form = ProductReviewForm(request.POST)
         if form.is_valid():

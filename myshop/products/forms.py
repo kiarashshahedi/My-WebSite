@@ -1,5 +1,5 @@
 from django import forms
-from .models import ProductReview
+from .models import ProductReview, Product
 from accounts.models import BuyerProfile
 
 class ProductReviewForm(forms.ModelForm):
@@ -19,4 +19,19 @@ class FavoriteCategoriesForm(forms.ModelForm):
         fields = ['favorite_categories']
         widgets = {
             'favorite_categories': forms.CheckboxSelectMultiple(),
+        }
+
+# product form 
+class ProductForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        fields = ['name', 'category', 'price', 'description', 'image', 'sku', 'color']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'category': forms.Select(attrs={'class': 'form-control'}),
+            'price': forms.NumberInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control'}),
+            'image': forms.FileInput(attrs={'class': 'form-control'}),
+            'sku': forms.NumberInput(attrs={'class': 'form-control'}),
+            'color': forms.Select(attrs={'class': 'form-control'}),
         }

@@ -1,19 +1,10 @@
 {% load static %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ product.name }} - Product Details</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Include your CSS stylesheets here -->
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-</head>
-<body>
-    <header>
-        <h1>{{ product.name }}</h1>
-        <!-- Include your navigation bar here -->
-    </header>
 
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}product detail{% endblock %}
+
+{% block content %}
     <main>
         <div class="product-detail-container">
             <div class="product-images">
@@ -62,10 +53,4 @@
             {% endif %}
         </section>
     </main>
-
-    <footer>
-        <!-- Include your footer here -->
-        <p>&copy; {{ current_year }} My E-commerce Site. All rights reserved.</p>
-    </footer>
-</body>
-</html>
+{% endblock %}

@@ -4,7 +4,7 @@ from accounts.models import SellerProfile
 from products.models import Product
 from orders.models import Order
 from accounts.forms import SellerBankDetailsForm
-from products.forms import ProductReviewForm
+from products.forms import ProductReviewForm, ProductForm
 
 @login_required
 def seller_dashboard(request):
@@ -24,25 +24,25 @@ def seller_dashboard(request):
         'total_revenue': total_revenue,
     }
     
-    return render(request, 'seller/dashboard.html', context)
+    return render(request, 'dashboard/dashboard.html', context)
 
 @login_required
 def manage_products(request):
     products = Product.objects.filter(seller=request.user.seller_profile)
-    return render(request, 'seller/manage_products.html', {'products': products})
+    return render(request, 'dashboard/manage_products.html', {'products': products})
 
 @login_required
 def add_product(request):
     if request.method == 'POST':
-        form = ProductReviewForm(request.POST, request.FILES)
+        form = ProductForm(request.POST, request.FILES)
         if form.is_valid():
             product = form.save(commit=False)
             product.seller = request.user.seller_profile
             product.save()
             return redirect('manage_products')
     else:
-        form = ProductReviewForm()
-    return render(request, 'seller/add_product.html', {'form': form})
+        form = ProductForm()
+    return render(request, 'dashboard/add_product.html', {'form': form})
 
 @login_required
 def edit_product(request, product_id):
@@ -54,7 +54,7 @@ def edit_product(request, product_id):
             return redirect('manage_products')
     else:
         form = ProductReviewForm(instance=product)
-    return render(request, 'seller/edit_product.html', {'form': form, 'product': product})
+    return render(request, 'dashboard/edit_product.html', {'form': form, 'product': product})
 
 @login_required
 def delete_product(request, product_id):
@@ -62,12 +62,12 @@ def delete_product(request, product_id):
     if request.method == 'POST':
         product.delete()
         return redirect('manage_products')
-    return render(request, 'seller/delete_product.html', {'product': product})
+    return render(request, 'dashboard/delete_product.html', {'product': product})
 
 @login_required
 def view_orders(request):
     orders = Order.objects.filter(items__product__seller=request.user.seller_profile).distinct()
-    return render(request, 'seller/view_orders.html', {'orders': orders})
+    return render(request, 'dashboard/view_orders.html', {'orders': orders})
 
 @login_required
 def update_bank_details(request):
@@ -79,4 +79,4 @@ def update_bank_details(request):
             return redirect('seller_dashboard')
     else:
         form = SellerBankDetailsForm(instance=seller_profile)
-    return render(request, 'seller/update_bank_details.html', {'form': form})
+    return render(request, 'dashboard/update_bank_details.html', {'form': form})
