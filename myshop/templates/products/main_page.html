@@ -1,30 +1,29 @@
-{% extends 'base.html' %}
-{% block title %}home{% endblock %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home - My E-commerce Site</title>
+</head>
+<body>
+    <h1>Welcome to Our E-commerce Site</h1>
 
-{% block content %}
-<h1>Welcome to Our E-commerce Site</h1>
-
-<h2>Recommended for You</h2>
-{% if recommended_products %}
-    <ul>
-        {% for product in recommended_products %}
-            <li>
-                <a href="{% url 'product_detail' product.id %}">{{ product.name }}</a> - {{ product.display_price }}
-            </li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>No recommendations available.</p>
-{% endif %}
-
-<h2>All Products</h2>
-<ul>
-    {% for product in products %}
-        <li>
-            <a href="{% url 'product_detail' product.id %}">{{ product.name }}</a> - {{ product.display_price }}
-        </li>
-    {% endfor %}
-</ul>
-
-{% endblock %}
-
+    {% if user.is_authenticated and recommended_products %}
+        <h2>Recommended for You</h2>
+        <ul>
+            {% for product in recommended_products %}
+                <li>
+                    <a href="{% url 'product_detail' product.id %}">{{ product.name }}</a> - {{ product.display_price }} Toman
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <h2>All Products</h2>
+        <ul>
+            {% for product in products %}
+                <li>
+                    <a href="{% url 'product_detail' product.id %}">{{ product.name }}</a> - {{ product.display_price }} Toman
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>

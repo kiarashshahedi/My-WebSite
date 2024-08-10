@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Product, Category, ProductReview
+from .models import Product, Category, UserProductInteraction
 from django.contrib.auth.decorators import login_required
 from .forms import ProductReviewForm
 from .recommendations import recommend_products
@@ -7,15 +7,13 @@ from .forms import FavoriteCategoriesForm
 
 # showing by interest
 def main_page(request):
- # Get all products
+    # Default to all products
     products = Product.objects.all()
-    
-    # Get recommended products if the user is logged in
-    recommended_products = []
-    if request.user.is_authenticated:
-        recommended_products = recommend_products(request.user)
 
-    return render(request, 'main_page.html', {
+    # Get recommended products if the user is logged in and has interaction data
+    recommended_products = recommend_products(request.user)
+
+    return render(request, 'products/main_page.html', {
         'products': products,
         'recommended_products': recommended_products,
     })
@@ -74,3 +72,14 @@ def update_preferences(request):
         form = FavoriteCategoriesForm(instance=request.user.buyer_profile)
 
     return render(request, 'update_preferences.html', {'form': form})
+
+
+# interested products
+def product_detail(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    
+    # Track product view interaction
+    if request.user.is_authenticated:
+        UserProductInteraction.objects.create(user=request.user, product=product, interaction_type='view')
+
+    return render(request, 'products/product_detail.html', {'product': product})

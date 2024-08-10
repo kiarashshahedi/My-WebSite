@@ -64,10 +64,10 @@ WSGI_APPLICATION = 'myshop.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'myshop_db',
-        'USER': 'myshop_user',
-        'PASSWORD': 'password',
-        'HOST': '127.0.0.1',
+        'NAME': 'website',
+        'USER': 'postgres',
+        'PASSWORD': '4431',
+        'HOST': 'localhost',
         'PORT': '5432',
     }
 }
@@ -99,7 +99,8 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -125,3 +126,13 @@ LOCALE_PATHS = [
 # ZARINPAL 
 ZARINPAL_MERCHANT_ID = 'your-merchant-id'
 ZARINPAL_SANDBOX = True  # Use True for testing and False for production
+
+#CACHE
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
+
+CACHE_TIMEOUT = 60 * 15  # Cache for 15 minutes

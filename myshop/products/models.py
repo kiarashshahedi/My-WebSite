@@ -76,3 +76,20 @@ class ProductImage(models.Model):
 
     def __str__(self):
         return f"Image for {self.product.name}"
+    
+User = get_user_model()
+# intrested products
+class UserProductInteraction(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='interactions', null=True, blank=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    interaction_type = models.CharField(max_length=50, choices=[
+        ('view', 'View'),
+        ('click', 'Click'),
+        ('add_to_cart', 'Add to Cart'),
+        ('purchase', 'Purchase'),
+    ])
+    interaction_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user} - {self.product} ({self.interaction_type})"    
+    

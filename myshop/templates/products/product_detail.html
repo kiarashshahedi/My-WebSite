@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ product.name }} - Product Details</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Include your CSS stylesheets here -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <header>
+        <h1>{{ product.name }}</h1>
+        <!-- Include your navigation bar here -->
+    </header>
+
+    <main>
+        <div class="product-detail-container">
+            <div class="product-images">
+                {% if product.images.all %}
+                    <div class="main-image">
+                        <img src="{{ product.images.first.url }}" alt="{{ product.name }}">
+                    </div>
+                    <div class="thumbnail-images">
+                        {% for image in product.images.all %}
+                            <img src="{{ image.url }}" alt="{{ product.name }}" class="thumbnail">
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>No images available</p>
+                {% endif %}
+            </div>
+
+            <div class="product-info">
+                <h2>{{ product.name }}</h2>
+                <p class="price">{{ product.display_price }} Toman</p>
+                <p class="description">{{ product.description }}</p>
+
+                <!-- Add to Cart Form -->
+                <form action="{% url 'add_to_cart' product.id %}" method="post">
+                    {% csrf_token %}
+                    <input type="number" name="quantity" value="1" min="1">
+                    <button type="submit">Add to Cart</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Reviews Section -->
+        <section class="reviews">
+            <h3>Reviews</h3>
+            {% if product.reviews.exists %}
+                <ul>
+                    {% for review in product.reviews.all %}
+                        <li>
+                            <strong>{{ review.user.username }}</strong> (Rating: {{ review.rating }}/5)
+                            <p>{{ review.comment }}</p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No reviews yet. Be the first to review this product!</p>
+            {% endif %}
+        </section>
+    </main>
+
+    <footer>
+        <!-- Include your footer here -->
+        <p>&copy; {{ current_year }} My E-commerce Site. All rights reserved.</p>
+    </footer>
+</body>
+</html>

@@ -37,7 +37,7 @@ def create_order(request):
     # Clear the cart
     request.session['cart'] = {}
 
-    return JsonResponse({'order_id': order.id, 'total_price': order.total_price})
+    return redirect('payment', order_id=order.id)
 
 def payment_view(request, order_id):
     order = get_object_or_404(Order, id=order_id, buyer=request.user)
