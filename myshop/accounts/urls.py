@@ -14,6 +14,8 @@ urlpatterns = [
     path('buyer/dashboard/', views.buyer_dashboard, name='buyer_dashboard'),
     path('profile/update/', views.update_buyer_profile, name='update_buyer_profile'),
     path('shipping/addresses/', views.manage_shipping_addresses, name='manage_shipping_addresses'),
+    path('shipping/address/<int:id>/update/', views.update_shipping_address, name='update_shipping_address'),
+
     path('order/history/', views.order_history, name='order_history'),
     path('order/<int:order_id>/', views.order_detail, name='order_detail'),
     

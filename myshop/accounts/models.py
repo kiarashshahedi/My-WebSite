@@ -54,14 +54,14 @@ class SellerProfile(models.Model):
 
 # address model 
 class ShippingAddress(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    address_line1 = models.CharField(max_length=255)
-    address_line2 = models.CharField(max_length=255, blank=True)
-    city = models.CharField(max_length=100)
-    state = models.CharField(max_length=100)
-    postal_code = models.CharField(max_length=20)
-    country = models.CharField(max_length=100)
-    is_default = models.BooleanField(default=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, verbose_name=("user"))
+    address_line1 = models.CharField(max_length=255, verbose_name=("address line 1"))
+    address_line2 = models.CharField(max_length=255, blank=True, verbose_name=("address line 2"))
+    city = models.CharField(max_length=100, verbose_name=("city"))
+    state = models.CharField(max_length=100, verbose_name=("state"))
+    postal_code = models.CharField(max_length=20, verbose_name=("postal code"))
+    country = models.CharField(max_length=100, verbose_name=("country"))
+    is_default = models.BooleanField(default=False, verbose_name=("is default"))
 
     def __str__(self):
         return f"{self.address_line1}, {self.city}, {self.country}"

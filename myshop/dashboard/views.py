@@ -83,3 +83,6 @@ def update_bank_details(request):
     else:
         form = SellerBankDetailsForm(instance=seller_profile)
     return render(request, 'dashboard/update_bank_details.html', {'form': form})
+
+
+

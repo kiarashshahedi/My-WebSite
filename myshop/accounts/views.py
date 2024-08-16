@@ -2,15 +2,15 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
 from django.db import IntegrityError
 from django.contrib.auth.decorators import login_required
-from .forms import SellerBankDetailsForm, BuyerProfileForm, ShippingAddressForm
-from .models import SellerProfile, BuyerProfile, ShippingAddress
-# models 
+from django.contrib import messages
+from django.utils import translation
+
+# file imports 
 from products.models import Product
 from orders.models import Order
 from .models import CustomUser, SellerProfile, BuyerProfile
-
-
-
+from .models import SellerProfile, BuyerProfile, ShippingAddress
+from .forms import SellerBankDetailsForm, BuyerProfileForm, ShippingAddressForm
 
 
 # ------------------------------------------------------------ seller -------------------------------------------------------
@@ -163,23 +163,70 @@ def update_buyer_profile(request):
     return render(request, 'dashboard/update_buyer_profile.html', {'form': form})
 
 
-# BUYER SHIPPING ADDRESS 
 @login_required
 def manage_shipping_addresses(request):
     buyer_profile = get_object_or_404(BuyerProfile, user=request.user)
     addresses = ShippingAddress.objects.filter(user=request.user)
 
     if request.method == 'POST':
-        form = ShippingAddressForm(request.POST)
-        if form.is_valid():
-            address = form.save(commit=False)
-            address.user = request.user
-            address.save()
-            return redirect('manage_shipping_addresses')
-    else:
-        form = ShippingAddressForm()
+        # Manually extracting form data
+        address_line1 = request.POST.get('address_line1')
+        address_line2 = request.POST.get('address_line2')
+        city = request.POST.get('city')
+        state = request.POST.get('state')
+        postal_code = request.POST.get('postal_code')
+        country = request.POST.get('country')
+        is_default = request.POST.get('is_default') == 'on'
+        
+        # Create and save the ShippingAddress object
+        ShippingAddress.objects.create(
+            user=request.user,
+            address_line1=address_line1,
+            address_line2=address_line2,
+            city=city,
+            state=state,
+            postal_code=postal_code,
+            country=country,
+            is_default=is_default
+        )
+        
+        return redirect('manage_shipping_addresses')
 
-    return render(request, 'dashboard/manage_shipping_addresses.html', {'form': form, 'addresses': addresses})
+    return render(request, 'dashboard/manage_shipping_addresses.html', {'addresses': addresses})
+
+@login_required
+def update_shipping_address(request, id):
+    translation.activate('fa')
+
+    address = get_object_or_404(ShippingAddress, id=id, user=request.user)
+    
+    if request.method == 'POST':
+        address.address_line1 = request.POST.get('address_line1')
+        address.address_line2 = request.POST.get('address_line2')
+        address.city = request.POST.get('city')
+        address.state = request.POST.get('state')
+        address.postal_code = request.POST.get('postal_code')
+        address.country = request.POST.get('country')
+        address.is_default = request.POST.get('is_default') == 'on'
+        
+        address.save()
+        messages.success(request, 'Shipping address updated successfully.')
+        return redirect('manage_shipping_addresses')
+
+    # Passing the current values to the template
+    context = {
+        'form': {
+            'address_line1': address.address_line1,
+            'address_line2': address.address_line2,
+            'city': address.city,
+            'state': address.state,
+            'postal_code': address.postal_code,
+            'country': address.country,
+            'is_default': address.is_default,
+        }
+    }
+    
+    return render(request, 'dashboard/update_shipping_address.html', context)
 
 # BUYER ORDER HISTORY
 @login_required
