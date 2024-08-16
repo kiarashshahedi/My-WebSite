@@ -169,7 +169,6 @@ def manage_shipping_addresses(request):
     addresses = ShippingAddress.objects.filter(user=request.user)
 
     if request.method == 'POST':
-        # Manually extracting form data
         address_line1 = request.POST.get('address_line1')
         address_line2 = request.POST.get('address_line2')
         city = request.POST.get('city')
@@ -177,9 +176,8 @@ def manage_shipping_addresses(request):
         postal_code = request.POST.get('postal_code')
         country = request.POST.get('country')
         is_default = request.POST.get('is_default') == 'on'
-        
-        # Create and save the ShippingAddress object
-        ShippingAddress.objects.create(
+
+        new_address = ShippingAddress(
             user=request.user,
             address_line1=address_line1,
             address_line2=address_line2,
@@ -189,13 +187,15 @@ def manage_shipping_addresses(request):
             country=country,
             is_default=is_default
         )
-        
+        new_address.save()
+
         return redirect('manage_shipping_addresses')
 
     return render(request, 'dashboard/manage_shipping_addresses.html', {'addresses': addresses})
 
 @login_required
 def update_shipping_address(request, id):
+    
     translation.activate('fa')
 
     address = get_object_or_404(ShippingAddress, id=id, user=request.user)
@@ -210,10 +210,9 @@ def update_shipping_address(request, id):
         address.is_default = request.POST.get('is_default') == 'on'
         
         address.save()
-        messages.success(request, 'Shipping address updated successfully.')
+        messages.success(request, ('Shipping address updated successfully.'))
         return redirect('manage_shipping_addresses')
 
-    # Passing the current values to the template
     context = {
         'form': {
             'address_line1': address.address_line1,
@@ -234,13 +233,13 @@ def order_history(request):
     buyer_profile = get_object_or_404(BuyerProfile, user=request.user)
     orders = buyer_profile.buy_history.all()
 
-    return render(request, 'dashboard/order_history.html', {'orders': orders})
+    return render(request, 'orders/order_history.html', {'orders': orders})
 
 # BUYER ORDER STATUS
 @login_required
 def order_detail(request, order_id):
     order = get_object_or_404(Order, id=order_id, purchased_by=request.user.buyer_profile)
-    return render(request, 'dashboard/order_detail.html', {'order': order})
+    return render(request, 'orders/order_detail.html', {'order': order})
 
 # ------------------------------------------------------------ end buyer---------------------------------------------------
 

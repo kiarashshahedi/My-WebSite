@@ -1,58 +1,59 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Manage Shipping Addresses</h1>
+<h1>مدیریت آدرس‌های ارسال</h1>
+
 <form method="post">
     {% csrf_token %}
     
     <div class="form-group">
-        <label for="id_address_line1">Address Line 1</label>
-        <input type="text" class="form-control" id="id_address_line1" name="address_line1" required>
-    </div>
-    
-    <div class="form-group">
-        <label for="id_address_line2">Address Line 2</label>
-        <input type="text" class="form-control" id="id_address_line2" name="address_line2">
+        <label for="address_line1">خط آدرس ۱</label>
+        <input type="text" class="form-control" id="address_line1" name="address_line1" required>
     </div>
 
     <div class="form-group">
-        <label for="id_city">City</label>
-        <input type="text" class="form-control" id="id_city" name="city" required>
+        <label for="address_line2">خط آدرس ۲</label>
+        <input type="text" class="form-control" id="address_line2" name="address_line2">
     </div>
 
     <div class="form-group">
-        <label for="id_state">State</label>
-        <input type="text" class="form-control" id="id_state" name="state" required>
+        <label for="city">شهر</label>
+        <input type="text" class="form-control" id="city" name="city" required>
     </div>
 
     <div class="form-group">
-        <label for="id_postal_code">Postal Code</label>
-        <input type="text" class="form-control" id="id_postal_code" name="postal_code" required>
+        <label for="state">استان</label>
+        <input type="text" class="form-control" id="state" name="state" required>
     </div>
 
     <div class="form-group">
-        <label for="id_country">Country</label>
-        <input type="text" class="form-control" id="id_country" name="country" required>
+        <label for="postal_code">کد پستی</label>
+        <input type="text" class="form-control" id="postal_code" name="postal_code" required>
+    </div>
+
+    <div class="form-group">
+        <label for="country">کشور</label>
+        <input type="text" class="form-control" id="country" name="country" required>
     </div>
 
     <div class="form-check">
-        <input type="checkbox" class="form-check-input" id="id_is_default" name="is_default">
-        <label class="form-check-label" for="id_is_default">Set as Default Address</label>
+        <input type="checkbox" class="form-check-input" id="is_default" name="is_default">
+        <label class="form-check-label" for="is_default">تعیین به عنوان آدرس پیش‌فرض</label>
     </div>
 
-    <button type="submit" class="btn btn-primary mt-3">Add Address</button>
+    <button type="submit" class="btn btn-primary mt-3">اضافه کردن آدرس</button>
 </form>
 
-<h2>Existing Addresses</h2>
+<h2>آدرس‌های موجود</h2>
 <ul>
     {% for address in addresses %}
     <li>
         {{ address }} 
-        {% if address.is_default %}(Default){% endif %}
-        <a href="{% url 'update_shipping_address' address.id %}">Edit</a>
+        {% if address.is_default %}(پیش‌فرض){% endif %}
+        <a href="{% url 'update_shipping_address' address.id %}">ویرایش</a>
     </li>
     {% empty %}
-    <li>No shipping addresses found.</li>
+    <li>هیچ آدرس ارسالی یافت نشد.</li>
     {% endfor %}
 </ul>
 {% endblock %}
