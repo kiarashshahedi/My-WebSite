@@ -1,5 +1,6 @@
 <!-- In templates/cart/cart_detail.html -->
 <form id="cart-form" method="post" action="{% url 'update_cart' %}">
+
     {% csrf_token %}
     <ul>
         {% for item in cart.items.all %}
@@ -10,8 +11,9 @@
             </li>
         {% endfor %}
     </ul>
+
     <p>Total: {{ cart.get_total_price }} Toman</p>
-    <!-- Removed the Update Cart button -->
+    
 </form>
 
 <script>
