@@ -1,56 +1,54 @@
-<!-- In templates/cart/cart_detail.html -->
-<form id="cart-form" method="post" action="{% url 'update_cart' %}">
-    {% csrf_token %}
-    <ul>
-        {% for item in cart.items.all %}
-            <li>
-                {{ item.product.name }} - {{ item.quantity }} x {{ item.product.display_price }} Toman
-                <input type="number" name="quantity_{{ item.id }}" value="{{ item.quantity }}" min="1" max="5" data-item-id="{{ item.id }}" class="quantity-input">
-                <a href="{% url 'remove_from_cart' item.id %}">Remove</a>
-            </li>
-        {% endfor %}
-    </ul>
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Seller Sign Up{% endblock %}
 
-    <p>Total: {{ cart.get_total_price }} Toman</p>
-    
-    <!-- Proceed to Checkout Button -->
-    <a href="{% url 'checkout' %}" class="btn btn-primary">Proceed to Checkout</a>
-</form>
+{% block content %}
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const quantityInputs = document.querySelectorAll('.quantity-input');
+    <div class="container mt-4">
+        <h1 class="mb-4">Your Cart</h1>
 
-        quantityInputs.forEach(input => {
-            input.addEventListener('change', function () {
-                const itemId = this.getAttribute('data-item-id');
-                const newQuantity = this.value;
+        <form id="cart-form" method="post" action="{% url 'update_cart' %}">
+            {% csrf_token %}
+            {% if cart.items.count > 0 %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in cart.items.all %}
+                                <tr>
+                                    <td>{{ item.product.name }}</td>
+                                    <td>{{ item.product.display_price }} Toman</td>
+                                    <td>
+                                        <input type="number" name="quantity_{{ item.id }}" value="{{ item.quantity }}" min="1" max="5" data-item-id="{{ item.id }}" class="form-control quantity-input">
+                                    </td>
+                                    <td>{{ item.quantity|floatformat:2 }} x {{ item.product.display_price }} = {{ item.get_total_price }} Toman</td>
+                                    <td>
+                                        <a href="{% url 'remove_from_cart' item.id %}" class="btn btn-danger btn-sm">Remove</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
 
-                // Create a new FormData object
-                const formData = new FormData();
-                formData.append(`quantity_${itemId}`, newQuantity);
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <p class="h4 mb-0">Total: {{ cart.get_total_price }} Toman</p>
+                    <a href="{% url 'checkout' %}" class="btn btn-primary btn-lg">Proceed to Checkout</a>
+                </div>
+            {% else %}
+                <div class="alert alert-info" role="alert">
+                    Your cart is empty. <a href="{% url 'main_page' %}" class="btn btn-info mt-2">Continue Shopping</a>
+                </div>
+            {% endif %}
+        </form>
 
-                // Send AJAX request to update cart
-                fetch('{% url "update_cart" %}', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}' // Add CSRF token
-                    }
-                }).then(response => {
-                    if (response.ok) {
-                        // Optionally, update the cart display or handle success response
-                        return response.json();
-                    } else {
-                        throw new Error('Failed to update cart');
-                    }
-                }).then(data => {
-                    console.log('Cart updated successfully', data);
-                    location.reload(); // Reload to reflect changes
-                }).catch(error => {
-                    console.error('Error:', error);
-                });
-            });
-        });
-    });
-</script>
+    </div>
+{% endblock %}
