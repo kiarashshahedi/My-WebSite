@@ -19,9 +19,11 @@ urlpatterns = [
     path('order/history/', views.order_history, name='order_history'),
     path('order/<int:order_id>/', views.order_detail, name='order_detail'),
     
+    #login
+    path('login/', views.user_login, name='login'),
+
     # LOGOUT
-    path('logout/', LogoutView.as_view(), name='logout'),
-    
-    
+    path('logout/', views.user_logout, name='logout'),
+    # path('logout/', LogoutView.as_view, name='logout'),
 
 ]

@@ -37,6 +37,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'accounts.middleware.AdminAccessMiddleware'
 ]
 
 ROOT_URLCONF = 'myshop.urls'
@@ -138,3 +139,8 @@ CACHES = {
 }
 
 CACHE_TIMEOUT = 60 * 15  # Cache for 15 minutes
+
+
+# session  
+SESSION_COOKIE_SECURE = False
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True

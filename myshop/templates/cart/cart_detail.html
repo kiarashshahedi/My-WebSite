@@ -1,6 +1,5 @@
 <!-- In templates/cart/cart_detail.html -->
 <form id="cart-form" method="post" action="{% url 'update_cart' %}">
-
     {% csrf_token %}
     <ul>
         {% for item in cart.items.all %}
@@ -14,6 +13,8 @@
 
     <p>Total: {{ cart.get_total_price }} Toman</p>
     
+    <!-- Proceed to Checkout Button -->
+    <a href="{% url 'checkout' %}" class="btn btn-primary">Proceed to Checkout</a>
 </form>
 
 <script>

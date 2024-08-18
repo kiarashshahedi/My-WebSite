@@ -6,7 +6,11 @@ class CustomUser(AbstractUser):
     
     is_seller = models.BooleanField(default=False)
     is_buyer = models.BooleanField(default=True)
-    phone_number = models.CharField(max_length=15, null=True, blank=True)
+    
+    phone_number = models.CharField(max_length=11, unique=True, null=True, blank=True)
+    otp = models.CharField(max_length=6, null=True, blank=True)  # Store OTP here
+    otp_expiry = models.DateTimeField(null=True, blank=True)  # Store OTP expiry time here
+    
     # برای اینکه کاربران بتوانند عکس پروفایل را آپلود کنند
     profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
     # برای پیگیری زمان عضویت کاربر به پلتفرم 

@@ -2,9 +2,6 @@ from django.db import models
 from accounts.models import SellerProfile
 from django.contrib.auth import get_user_model
 
-
-
-
 class Category(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)

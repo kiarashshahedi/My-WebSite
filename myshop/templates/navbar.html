@@ -1,59 +1,52 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-
-    <a class="navbar-brand" href="{% url 'main_page' %}">My Shop</a>
+    <a class="navbar-brand" href="{% url 'main_page' %}">TAK-KHARID</a>
 
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     
     <div class="collapse navbar-collapse" id="navbarNav">
-
         <ul class="navbar-nav ml-auto">
+
             <li class="nav-item">
-
-                <a class="nav-link" href="{% url 'main_page' %}">Home</a>
-
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="collapse navbar-collapse" id="navbarNav">
-
-                    <ul class="navbar-nav ml-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'cart_detail' %}">
-                                <i class="fas fa-shopping-cart"></i>
-                                <span class="badge badge-pill badge-danger">{{ cart_items_count }}</span>
-                                Cart
-                            </a>
-                        </li>
-                    </ul>
-
-                </div>
+                <a class="nav-link" href="{% url 'main_page' %}">خانه</a>
             </li>
-
+            
             {% if user.is_authenticated %}
+
                 {% if user.is_seller %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'seller_dashboard' %}">Seller Dashboard</a>
+                        <a class="nav-link" href="{% url 'seller_dashboard' %}">داشبرد</a>
                     </li>
                 {% elif user.is_buyer %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'buyer_dashboard' %}">Buyer Dashboard</a>
+                        <a class="nav-link" href="{% url 'buyer_dashboard' %}">داشبرد</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'cart_detail' %}">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="badge badge-pill badge-danger">{{ cart_items_count }}</span>
+                            سبدخرید
+                        </a>
                     </li>
                 {% endif %}
+
                 <li class="nav-item">
-                    <form method="post" action="{% url 'logout' %}" class="form-inline">
+                    <form method="post" action="{% url 'logout' %}" style="display: inline;">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-link nav-link" style="display: inline; cursor: pointer;">Logout</button>
                     </form>
                 </li>
+
             {% else %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'seller_signup' %}">Signup as Seller</a>
+                    <a class="nav-link" href="{% url 'login' %}">ورود</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'buyer_signup' %}">Signup as Buyer</a>
+                    <a class="nav-link" href="{% url 'seller_signup' %}">ثبت نام فروشندگان</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'buyer_signup' %}">ثبت نام خریداران</a>
                 </li>
             {% endif %}
         </ul>

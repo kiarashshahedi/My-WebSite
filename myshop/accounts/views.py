@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login
+from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -243,3 +243,28 @@ def order_detail(request, order_id):
 
 # ------------------------------------------------------------ end buyer---------------------------------------------------
 
+def user_login(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        # Authenticate user
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            if user.is_superuser:
+                messages.error(request, 'شما اجازه ورود به عنوان ادمین را ندارید.')
+                return redirect('login')
+
+            login(request, user)
+            return redirect('main_page')
+        else:
+            messages.error(request, 'نام کاربری یا رمز عبور اشتباه است.')
+
+    return render(request, 'accounts/login.html')
+
+# Logout View
+def user_logout(request):
+    if request.method == "POST":
+        logout(request)
+        return redirect('main_page')
+    return redirect('main_page')
