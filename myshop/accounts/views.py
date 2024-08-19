@@ -3,89 +3,19 @@ from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.utils import translation
+import random
+import datetime
+from django.utils import timezone
+from django.core.mail import send_mail 
+from django.utils.crypto import get_random_string
+from django.conf import settings
 
 # file imports 
-from products.models import Product
 from orders.models import Order
-from .models import CustomUser, SellerProfile, BuyerProfile
-from .models import SellerProfile, BuyerProfile, ShippingAddress
-from .forms import SellerBankDetailsForm, BuyerProfileForm, ShippingAddressForm
+from .models import CustomUser, BuyerProfile
+from .models import BuyerProfile, ShippingAddress
+from .forms import  BuyerProfileForm, OTPForm, EmailLoginForm
 
-
-# ------------------------------------------------------------ seller -------------------------------------------------------
-
-# ثبت نام فروشنده
-def seller_signup(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        email = request.POST.get('email')
-        phone_number = request.POST.get('phone_number')
-        password1 = request.POST.get('password1')
-        password2 = request.POST.get('password2')
-        store_name = request.POST.get('store_name')
-        description = request.POST.get('description')
-        
-        # Simple validation
-        if not username or not password1 or not password2 or not email:
-            return render(request, 'accounts/seller_signup.html', {'error': 'تمامی فیلدها الزامی هستند.'})
-        
-        if password1 != password2:
-            return render(request, 'accounts/seller_signup.html', {'error': 'رمز عبورها مطابقت ندارند.'})
-
-        try:
-            # Check if username already exists
-            if CustomUser.objects.filter(username=username).exists():
-                return render(request, 'accounts/seller_signup.html', {'error': 'این نام کاربری قبلا ثبت شده است.'})
-
-            # Create the user
-            user = CustomUser.objects.create_user(
-                username=username,
-                email=email,
-                password=password1,
-                phone_number=phone_number
-            )
-            user.is_seller = True
-            user.save()
-
-            # Create the seller profile
-            SellerProfile.objects.create(
-                user=user,
-                store_name=store_name,
-                description=description
-            )
-
-            # Log in the user and redirect
-            login(request, user)
-            return redirect('main_page')
-
-        except IntegrityError:
-            # Handle cases where there is an unexpected database error
-            return render(request, 'accounts/seller_signup.html', {'error': 'مشکلی در ثبت نام پیش آمده است. لطفا دوباره تلاش کنید.'})
-    
-    return render(request, 'accounts/seller_signup.html')
-
-# نمایش لیست محصولات و سفارشات فروشنده
-@login_required
-def seller_dashboard(request):
-    products = request.user.seller_profile.products.all()
-    orders = Order.objects.filter(product__seller=request.user.seller_profile)
-    return render(request, 'accounts/seller_dashboard.html', {'products': products, 'orders': orders})
-
-# show bank and payments to seller
-@login_required
-def update_bank_details(request):
-    seller_profile = request.user.seller_profile
-
-    if request.method == 'POST':
-        form = SellerBankDetailsForm(request.POST, instance=seller_profile)
-        if form.is_valid():
-            form.save()
-            return redirect('seller_dashboard')  # Redirect to seller's dashboard after saving
-    else:
-        form = SellerBankDetailsForm(instance=seller_profile)
-
-    return render(request, 'seller/update_bank_details.html', {'form': form})
 
 # --------------------------------------------------- buyer ----------------------------------------------------------
 
@@ -131,117 +61,6 @@ def buyer_signup(request):
 
     return render(request, 'accounts/buyer_signup.html')
 
-# DASHBOARD
-@login_required
-def buyer_dashboard(request):
-    if hasattr(request.user, 'seller_profile'):
-        return redirect('seller_dashboard')  # Redirect sellers
-
-    buyer_profile = get_object_or_404(BuyerProfile, user=request.user)
-    orders = buyer_profile.get_last_orders()
-
-    context = {
-        'buyer_profile': buyer_profile,
-        'orders': orders,
-    }
-
-    return render(request, 'dashboard/buyer_dashboard.html', context)
-
-# UPDATE BUYER PROFILE
-@login_required
-def update_buyer_profile(request):
-    buyer_profile = get_object_or_404(BuyerProfile, user=request.user)
-    
-    if request.method == 'POST':
-        form = BuyerProfileForm(request.POST, instance=buyer_profile)
-        if form.is_valid():
-            form.save()
-            return redirect('buyer_dashboard')
-    else:
-        form = BuyerProfileForm(instance=buyer_profile)
-    
-    return render(request, 'dashboard/update_buyer_profile.html', {'form': form})
-
-
-@login_required
-def manage_shipping_addresses(request):
-    buyer_profile = get_object_or_404(BuyerProfile, user=request.user)
-    addresses = ShippingAddress.objects.filter(user=request.user)
-
-    if request.method == 'POST':
-        address_line1 = request.POST.get('address_line1')
-        address_line2 = request.POST.get('address_line2')
-        city = request.POST.get('city')
-        state = request.POST.get('state')
-        postal_code = request.POST.get('postal_code')
-        country = request.POST.get('country')
-        is_default = request.POST.get('is_default') == 'on'
-
-        new_address = ShippingAddress(
-            user=request.user,
-            address_line1=address_line1,
-            address_line2=address_line2,
-            city=city,
-            state=state,
-            postal_code=postal_code,
-            country=country,
-            is_default=is_default
-        )
-        new_address.save()
-
-        return redirect('manage_shipping_addresses')
-
-    return render(request, 'dashboard/manage_shipping_addresses.html', {'addresses': addresses})
-
-@login_required
-def update_shipping_address(request, id):
-    
-    translation.activate('fa')
-
-    address = get_object_or_404(ShippingAddress, id=id, user=request.user)
-    
-    if request.method == 'POST':
-        address.address_line1 = request.POST.get('address_line1')
-        address.address_line2 = request.POST.get('address_line2')
-        address.city = request.POST.get('city')
-        address.state = request.POST.get('state')
-        address.postal_code = request.POST.get('postal_code')
-        address.country = request.POST.get('country')
-        address.is_default = request.POST.get('is_default') == 'on'
-        
-        address.save()
-        messages.success(request, ('Shipping address updated successfully.'))
-        return redirect('manage_shipping_addresses')
-
-    context = {
-        'form': {
-            'address_line1': address.address_line1,
-            'address_line2': address.address_line2,
-            'city': address.city,
-            'state': address.state,
-            'postal_code': address.postal_code,
-            'country': address.country,
-            'is_default': address.is_default,
-        }
-    }
-    
-    return render(request, 'dashboard/update_shipping_address.html', context)
-
-# BUYER ORDER HISTORY
-@login_required
-def order_history(request):
-    buyer_profile = get_object_or_404(BuyerProfile, user=request.user)
-    orders = buyer_profile.buy_history.all()
-
-    return render(request, 'orders/order_history.html', {'orders': orders})
-
-# BUYER ORDER STATUS
-@login_required
-def order_detail(request, order_id):
-    order = get_object_or_404(Order, id=order_id, purchased_by=request.user.buyer_profile)
-    return render(request, 'orders/order_detail.html', {'order': order})
-
-# ------------------------------------------------------------ end buyer---------------------------------------------------
 
 def user_login(request):
     if request.method == 'POST':
@@ -268,3 +87,105 @@ def user_logout(request):
         logout(request)
         return redirect('main_page')
     return redirect('main_page')
+
+# ------------------------------------------------------------- MOBILE OTP --------------------------------------------------
+
+def generate_otp():
+    return str(random.randint(100000, 999999))
+
+def send_otp_via_sms(phone_number, otp):
+    # Replace this with your SMS sending logic, e.g., using Twilio
+    pass
+
+def request_otp(request):
+    if request.method == 'POST':
+        phone_number = request.POST.get('phone_number')
+        user = CustomUser.objects.filter(phone_number=phone_number).first()
+        if user:
+            otp = generate_otp()
+            user.otp = otp
+            user.otp_expiry = timezone.now() + datetime.timedelta(minutes=10)  # OTP valid for 10 minutes
+            user.save()
+            send_otp_via_sms(phone_number, otp)
+            return redirect('verify_otp_mobile')
+        else:
+            return render(request, 'accounts/request_otp.html', {'error': 'Phone number not found.'})
+    return render(request, 'accounts/request_otp.html')
+
+def verify_otp_mobile(request):
+    if request.method == 'POST':
+        phone_number = request.POST.get('phone_number')
+        otp = request.POST.get('otp')
+        user = CustomUser.objects.filter(phone_number=phone_number, otp=otp).first()
+        if user and user.otp_expiry > timezone.now():
+            user.otp = None
+            user.otp_expiry = None
+            user.save()
+            # Automatically log in the user
+            login(request, user)
+            return redirect('main_page')  # Redirect to a success page or dashboard
+        else:
+            return render(request, 'accounts/verify_otp.html', {'error': 'Invalid or expired OTP.'})
+    return render(request, 'accounts/verify_otp.html')
+
+# --------------------------------------------------------- EMAIL OTP ------------------------------------------------------
+
+def generate_otp():
+    return get_random_string(length=6, allowed_chars='0123456789')
+
+def send_otp_email(user):
+    otp = generate_otp()
+    user.otp = otp
+    user.otp_expiry = timezone.now() + timezone.timedelta(minutes=5)
+    user.save()
+    
+    subject = 'Your OTP Code'
+    message = f'Your OTP code is {otp}'
+    from_email = settings.EMAIL_HOST_USER
+    recipient_list = [user.email]
+    
+    send_mail(subject, message, from_email, recipient_list)
+
+def email_login(request):
+    if request.method == 'POST':
+        form = EmailLoginForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            user = CustomUser.objects.filter(email=email).first()
+
+            if user:
+                send_otp_email(user)
+                return redirect('verify_otp_email')
+            else:
+                # User does not exist, create a new user
+                new_user = CustomUser.objects.create(email=email, username=email, password=CustomUser.objects.make_random_password())
+                send_otp_email(new_user)
+                return redirect('verify_otp_email')
+    else:
+        form = EmailLoginForm()
+
+    return render(request, 'accounts/email_login.html', {'form': form})
+
+def verify_otp_email(request):
+    if request.method == 'POST':
+        form = OTPForm(request.POST)
+        if form.is_valid():
+            otp = form.cleaned_data['otp']
+            user = request.user
+            if user.otp == otp and user.otp_expiry > timezone.now():
+                user.otp = None
+                user.otp_expiry = None
+                user.save()
+                login(request, user)
+                return redirect('main_page')
+            else:
+                messages.error(request, 'Invalid OTP or OTP expired')
+    else:
+        form = OTPForm()
+    return render(request, 'accounts/email_verify_otp.html', {'form': form})
+
+
+def send_otp(request):
+    user = request.user
+    send_otp_email(user)
+    return render(request, 'accounts/email_send_otp.html', {'message': 'OTP has been sent to your email'})

@@ -40,13 +40,16 @@
 
             {% else %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'login' %}">ورود</a>
+                    <a class="nav-link" href="{% url 'email_login' %}">ورود با ایمیل</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'seller_signup' %}">ثبت نام فروشندگان</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'buyer_signup' %}">ثبت نام خریداران</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'request_otp' %}">ورود با موبایل</a>
                 </li>
             {% endif %}
         </ul>

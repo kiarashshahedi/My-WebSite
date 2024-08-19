@@ -1,0 +1,7 @@
+<!-- templates/accounts/email_login.html -->
+<h2>ورود با ایمیل</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">ارسال OTP</button>
+</form>

@@ -1,10 +1,12 @@
 from django.urls import path
-from .views import checkout, payment_view, payment_callback
+from . import views 
 
 urlpatterns = [
-    path('checkout/', checkout, name='checkout'),
-    path('payment/<int:order_id>/', payment_view, name='payment_view'),
-    path('payment/callback/<int:order_id>/', payment_callback, name='payment_callback'),
+    path('checkout/', views.checkout, name='checkout'),
+    path('payment/<int:order_id>/', views.payment_view, name='payment_view'),
+    path('payment/callback/<int:order_id>/', views.payment_callback, name='payment_callback'),
+    path('order/history/', views.order_history, name='order_history'),
+    path('order/<int:order_id>/', views.order_detail, name='order_detail'),
 ]
 
 

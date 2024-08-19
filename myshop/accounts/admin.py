@@ -1,15 +1,11 @@
 from django.contrib import admin
-from .models import CustomUser, SellerProfile, BuyerProfile, ShippingAddress
+from .models import CustomUser, BuyerProfile, ShippingAddress
 
 @admin.register(CustomUser)
 class CustomUserAdmin(admin.ModelAdmin):
     list_display = ('username', 'email', 'is_seller', 'is_buyer')
     search_fields = ('username', 'email')
 
-@admin.register(SellerProfile)
-class SellerProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'store_name', 'rating')
-    search_fields = ('store_name',)
 
 @admin.register(BuyerProfile)
 class BuyerProfileAdmin(admin.ModelAdmin):

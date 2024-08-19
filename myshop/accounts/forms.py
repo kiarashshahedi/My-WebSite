@@ -1,20 +1,9 @@
 from django import forms
-from .models import SellerProfile, BuyerProfile, ShippingAddress
+from .models import BuyerProfile, ShippingAddress
 
 # show the bank status and payments to seller
 
-class SellerBankDetailsForm(forms.ModelForm):
-    class Meta:
-        model = SellerProfile
-        fields = ['bank_account_number', 'bank_routing_number']
-        labels = {
-            'bank_account_number': 'Bank Account Number',
-            'bank_routing_number': 'Bank Routing Number',
-        }
-        widgets = {
-            'bank_account_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your bank account number'}),
-            'bank_routing_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your bank routing number'}),
-        }
+
 
 class BuyerProfileForm(forms.ModelForm):
     class Meta:
@@ -37,3 +26,10 @@ class ShippingAddressForm(forms.ModelForm):
             'country': forms.TextInput(attrs={'class': 'form-control'}),
             'is_default': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+
+# email OTP sending form     
+class EmailLoginForm(forms.Form):
+    email = forms.EmailField()
+
+class OTPForm(forms.Form):
+    otp = forms.CharField(max_length=6)

@@ -1,6 +1,9 @@
 from django.db import models
-from accounts.models import SellerProfile
+from seller.models import SellerProfile
 from django.contrib.auth import get_user_model
+
+
+
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
@@ -75,6 +78,7 @@ class ProductImage(models.Model):
         return f"Image for {self.product.name}"
     
 User = get_user_model()
+
 # intrested products
 class UserProductInteraction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='interactions', null=True, blank=True)

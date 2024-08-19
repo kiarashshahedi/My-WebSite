@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'orders',
     'products',
     'cart',
+    'seller',
     
 ]
 
@@ -144,3 +145,12 @@ CACHE_TIMEOUT = 60 * 15  # Cache for 15 minutes
 # session  
 SESSION_COOKIE_SECURE = False
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+
+# sending otp with email settings 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com' 
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'takkharidshop@gmail.com'  
+EMAIL_HOST_PASSWORD = 'T@KkharidIsTheBest' 

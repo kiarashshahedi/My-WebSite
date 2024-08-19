@@ -1,14 +1,13 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.conf import settings
-from products.models import Product
-from .models import Order, OrderItem, Payment
+from .models import Order, OrderItem
+from accounts.models import BuyerProfile
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.db import transaction
 from decimal import Decimal
 from cart.models import Cart
-from django.views.decorators.csrf import csrf_exempt
 import zarinpal
 
 
@@ -111,10 +110,22 @@ def distribute_payment(order, seller_amount, site_fee):
     seller.save()
 
 
+# order -----------------------------------
 
 
+# ORDER HISTORY
+@login_required
+def order_history(request):
+    buyer_profile = get_object_or_404(BuyerProfile, user=request.user)
+    orders = buyer_profile.buy_history.all()
 
+    return render(request, 'orders/order_history.html', {'orders': orders})
 
+# ORDER STATUS
+@login_required
+def order_detail(request, order_id):
+    order = get_object_or_404(Order, id=order_id, purchased_by=request.user.buyer_profile)
+    return render(request, 'orders/order_detail.html', {'order': order})
 
 
 

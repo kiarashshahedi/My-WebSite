@@ -1,0 +1,10 @@
+<!-- request_otp.html -->
+<form method="post">
+    {% csrf_token %}
+    <label for="phone_number">Phone Number:</label>
+    <input type="text" id="phone_number" name="phone_number" required>
+    <button type="submit">Send OTP</button>
+    {% if error %}
+        <p>{{ error }}</p>
+    {% endif %}
+</form>

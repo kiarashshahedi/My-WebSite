@@ -1,10 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Product, Category, UserProductInteraction
 from django.contrib.auth.decorators import login_required
+
+from .models import Product, Category, UserProductInteraction
 from .forms import ProductReviewForm
 from .recommendations import recommend_products
 from .forms import FavoriteCategoriesForm
+
 from orders.models import Order
+
 
 # showing by interest
 def main_page(request):
