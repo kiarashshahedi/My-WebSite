@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 
 from .models import Product, Category, UserProductInteraction
 from .forms import ProductReviewForm
@@ -96,3 +97,22 @@ def product_detail(request, product_id):
         UserProductInteraction.objects.create(user=request.user, product=product, interaction_type='view')
 
     return render(request, 'products/product_detail.html', {'product': product})
+
+
+
+def category_list(request, slug=None):
+    categories = Category.objects.filter(parent__isnull=True)
+    if slug:
+        category = get_object_or_404(Category, slug=slug)
+        products = Product.objects.filter(category=category)
+        subcategories = Category.objects.filter(parent=category)
+        return render(request, 'category_detail.html', {
+            'category': category,
+            'products': products,
+            'subcategories': subcategories,
+        })
+    return render(request, 'navbar.html', {'categories': categories})
+
+def category_detail(request, slug):
+    category = get_object_or_404(Category, slug=slug)
+    return render(request, 'category_detail.html', {'category': category})

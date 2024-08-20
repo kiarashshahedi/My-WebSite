@@ -12,13 +12,14 @@ class ProductAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at', 'updated_at')
 
     def save_model(self, request, obj, form, change):
-        if not change:
-            # Additional logic when creating a new object
-            pass
+        if obj.category:
+            obj.main_category = obj.category.get_ancestors(include_self=False).last()
         super().save_model(request, obj, form, change)
 
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description')
+    list_display = ('name', 'parent')
+    prepopulated_fields = {'slug': ('name',)}
+    list_filter = ('parent',)
 
 
 

@@ -1,0 +1,13 @@
+<h1>{{ category.name }}</h1>
+<p>Subcategories:</p>
+<ul>
+    {% for subcategory in subcategories %}
+        <li><a href="{% url 'category_detail' subcategory.slug %}">{{ subcategory.name }}</a></li>
+    {% endfor %}
+</ul>
+<p>Products:</p>
+<ul>
+    {% for product in products %}
+        <li>{{ product.name }} - {{ product.price }}</li>
+    {% endfor %}
+</ul>

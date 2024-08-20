@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 from seller.models import SellerProfile
 from django.contrib.auth import get_user_model
 
@@ -7,14 +8,17 @@ from django.contrib.auth import get_user_model
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
-    description = models.TextField(null=True, blank=True)
-    parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='children')
-    
-    class Meta:
-        verbose_name_plural = 'Categories'
+    slug = models.SlugField(unique=True)
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='children', on_delete=models.CASCADE)
+
     def __str__(self):
         return self.name
-    
+    def get_absolute_url(self):
+        return reverse('category_detail', kwargs={'slug': self.slug})
+
+    class Meta:
+        ordering = ['name']
+
 class Product(models.Model):
     
     COLOR_CHOICES = [
